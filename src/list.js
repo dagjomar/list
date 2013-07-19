@@ -251,6 +251,7 @@ var List = function(id, options, values) {
             isAsc = false,
             asc = 'asc',
             desc = 'desc',
+            datatype,
             options = options || {};
 
         if (target === undefined) {
@@ -259,6 +260,7 @@ var List = function(id, options, values) {
         } else {
             value = h.getAttribute(target, 'data-sort');
             isAsc = h.hasClass(target, asc) ? false : true;
+            datatype = h.getAttribute(target, 'data-type');
         }
         for (var i = 0, il = sortButtons.length; i < il; i++) {
             h.removeClass(sortButtons[i], asc);
@@ -280,7 +282,10 @@ var List = function(id, options, values) {
             options.sortFunction = options.sortFunction;
         } else {
             options.sortFunction = function(a, b) {
-                return h.sorter.alphanum(a.values()[value].toLowerCase(), b.values()[value].toLowerCase(), isAsc);
+                if (datatype=='number')
+                    return h.sorter.number(a.values()[value], b.values()[value], isAsc);
+                else
+                    return h.sorter.alphanum(a.values()[value].toLowerCase(), b.values()[value].toLowerCase(), isAsc);
             };
         }
         self.items.sort(options.sortFunction);
@@ -764,6 +769,9 @@ h = {
                 }
             }
             return aa.length - bb.length;
+        },
+        number : function(a,b,asc){
+            return (asc ? (a - b) : (b -a) );
         },
         chunkify: function(t) {
             var tz = [], x = 0, y = -1, n = 0, i, j;
