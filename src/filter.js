@@ -15,11 +15,22 @@ module.exports = function(list) {
             var is = list.items;
             for (var i = 0, il = is.length; i < il; i++) {
                 var item = is[i];
-                if (filterFunction(item)) {
-                    item.filtered = true;
-                } else {
-                    item.filtered = false;
+
+                var pass = true;
+
+                if( Object.prototype.toString.call( filterFunction ) === '[object Array]' ) {
+                    var n = 0;
+                    while( n < filterFunction.length && pass ){ //While item passes filterFunctions, we continue. No need to continue checking filters if it fails an early filter function
+                        pass = filterFunction[n](item);
+                        n++
+                    }
+                }else{
+                    pass = filterFunction(item);
                 }
+                
+                if (pass) item.filtered = true;
+                else item.filtered = false;
+
             }
         }
         list.update();
